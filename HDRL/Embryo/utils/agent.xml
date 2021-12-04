@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<mujoco model="agent">
+	<option timestep="0.01"/>
+	<size nconmax="8000" njmax="8000"/>
+	<worldbody>
+		<body name="agent" pos="270.0, 303.0, 27.5">
+			<geom mass="1.0" name="geo_agent" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="agent" pos="0.0, 0.0, 0.0">
+			<geom mass="1.0" name="geo_agent" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+	</worldbody>
+	<actuator/>
+</mujoco>

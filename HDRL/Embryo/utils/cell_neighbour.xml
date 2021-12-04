@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<mujoco model="cell">
+	<option timestep="0.01"/>
+	<size nconmax="8000" njmax="8000"/>
+	<worldbody>
+		<body name="cell0" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell0" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell1" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell1" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell2" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell2" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell3" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell3" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell4" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell4" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell5" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell5" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell6" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell6" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell7" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell7" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell8" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell8" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell9" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell9" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell10" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell10" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell11" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell11" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell12" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell12" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell13" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell13" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell14" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell14" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell15" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell15" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell16" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell16" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell17" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell17" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+		<body name="cell18" pos="0 0 0">
+			<geom mass="1.0" name="geo_cell18" rgba="0 0 0 0" size="5" type="sphere"/>
+		</body>
+	</worldbody>
+	<actuator/>
+</mujoco>
