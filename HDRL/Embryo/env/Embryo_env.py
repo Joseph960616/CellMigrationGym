@@ -1,24 +1,22 @@
-import os,time,inspect, datetime
+import os,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(os.path.dirname(currentdir))
+projectdir = os.path.dirname(parentdir)
 os.sys.path.insert(0, parentdir)
 
 import matplotlib.pyplot as plt
 import _pickle as pickle
-from PIL import Image
 import numpy as np
 import pybullet as p
-import gym, cv2
-from random import random
+import gym
 from Embryo.env.Embryo_agent import EmbryoAgent
 from Embryo.utils.utils import rgb2gray, gray2twobit, depth_conversion
 from Embryo.utils.embryo import Embryo
 
-NEIGHBOR_MODEL_PATH = parentdir + '/Embryo/trained_models/neighbor_model.pkl'
+NEIGHBOR_MODEL_PATH = parentdir + '/trained_models/neighbor_model.pkl'
 #Goal parameters
 AI_CELL = 'Cpaaa'
 TARGET_CELL = 'ABarpaapp'
-
 STATE_CELL_LIST = ['ABarpppap', 'ABarppppa', 'ABarppppp', 'Caaaa', 'ABprapapp', 'Epra', 'ABprapaaa', \
                                 'ABprapaap', 'Cpaap', 'ABprapapa', 'ABarppapp', 'Caaap', 'Eprp', 'ABarpppaa', 'Eplp', \
                                 'ABarppapa', 'Epla', 'ABarppaap']
@@ -47,7 +45,7 @@ class EmbryoBulletEnv(gym.Env):
     def __init__(self, method='direct', embryo_num = 0):
         #Initialization
         print('\nInitializing environment...')
-        self.data_path = os.path.join(parentdir,'Embryo/utils/data/%d/nuclei/t%03d-nuclei')
+        self.data_path = projectdir + '/data/cpaaa_%d/nuclei/t%03d-nuclei'
         self.start_point = 0
         self.end_point = 0
         self.ticks = 0
@@ -60,6 +58,7 @@ class EmbryoBulletEnv(gym.Env):
         self.embryo_volume_list = EMBRYO_VOLUME_LIST
         self.plane_resolution = PLANE_RESOLUTION
         self.tick_resolution = TICK_RESOLUTION
+        self.time_step = TIME_STEP
         self.state_value_dict = {}
         self.neighbor_model = pickle.load(open(NEIGHBOR_MODEL_PATH, 'rb'))
         self.create(method)
@@ -73,8 +72,6 @@ class EmbryoBulletEnv(gym.Env):
         self.ai_locations = []
         self.target_locations = []
         self.subgoal_done_step = []
-        n_neighbor_choice = np.random.randint(len(NEIGHBOR_CANDIDATE_1))
-        self.current_subgoal = NEIGHBOR_CANDIDATE_1[n_neighbor_choice]
         ########################################################
 
         #gym space
@@ -95,12 +92,10 @@ class EmbryoBulletEnv(gym.Env):
         # self.embryo_volume = em.volume
         ##pre-calculated embryo volume
         self.embryo_volume = self.embryo_volume_list[self.embryo_num]
-        # self.embryo_volume = 3283749.721165
         #Load nuclei data from 1-200
         self.data_dicts = self.load_data()
         self.end_tick = (self.end_point - self.start_point) * self.tick_resolution - 11
         print("start point: %d\nend point: %d\n" %(self.start_point,self.end_point ))
-    
 
         #Data interpolation
         self.pos_interpolations_a,self.cell_name_interpolations_a = \
@@ -149,7 +144,7 @@ class EmbryoBulletEnv(gym.Env):
                 self.client = p.connect(p.GUI)
         elif method == "direct":
             self.client = p.connect(p.DIRECT)
-        p.setTimeStep(TIME_STEP)
+        p.setTimeStep(self.time_step)
         p.setRealTimeSimulation(0)
         print('\nConnected to pybullet client with %s render mode'% method)
 
@@ -216,17 +211,6 @@ class EmbryoBulletEnv(gym.Env):
                             cell's name as key, tuple (position, nuclei_radius) as value
                             Eg. stage 170 with cell name 'Cpaaa':
                                 data_dicts[170]['Cpaaa'] -->([240.0, 230.0, 70.0], 15.0)
-
-        ##########Fig2D & HDRL embryo##########
-        ZD_BV82_WT_20110419_3_s2_emb3_edited --> (1,5)
-        ZD_BV82_WT_20110426_1_s1_emb3_edited --> (1,7)
-        ZD_RW10348_WT_20110126_2_s2_emb2_edited --> (2,4)
-        ZD_RW10348_WT_20110427_3_s1_emb1_edited --> (2,5)
-        ZD_RW10348_WT_20110427_3_s1_emb2_edited --> (2,6)
-        ZD_RW10348_WT_20110427_3_s4_emb2_edited --> (2,10)
-        ZD_RW10434_20110126_2_s4_emb3_edited --> (4,5)
-        ZD_RW10714_WT_20110724_1_s2_emb1_edited --> (5,4)
-        ZD_RW10714_WT_20110724_1_s3_emb1_edited --> (5,7)  
         """
         data_path = self.data_path
         state_cell_list = self.state_cell_list
@@ -249,7 +233,6 @@ class EmbryoBulletEnv(gym.Env):
         cell_name_target_a = []
         for i in range (stage_num):
             path = data_path % (self.embryo_num,start+i) 
-            # path = '/Users/joseph/Documents/UTK/NIH2/WT50_release_revised/zhuo_wt_RW10434/05/nuclei/t%03d-nuclei' % (start+i)
             pos = []
             radius = []
             cell_name = []
@@ -562,7 +545,6 @@ class EmbryoBulletEnv(gym.Env):
             if self.current_subgoal_index < len(self.subgoals):
                 self.current_subgoal = self.subgoals[self.current_subgoal_index]
             else:
-                # self.current_subgoal_index = len(self.subgoals)
                 self.current_subgoal = [self.target_cell_name]
             self.neighbor_goal_counter = 0
         if self.ticks == self.end_tick:
@@ -634,8 +616,6 @@ class EmbryoBulletEnv(gym.Env):
         orientation = [0,0,0,1]
         img_start = img_resolution // 4 + 1             # cutting between [33,97)
         img_end = img_resolution* 3 // 4 + 1
-        # img_start = 0           # cutting between [33,97)
-        # img_end = 128
         #Disable all rendering
         p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 0)
         p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
@@ -657,63 +637,60 @@ class EmbryoBulletEnv(gym.Env):
             p.resetBasePositionAndOrientation(cell[j],self.pos_interpolations_neighbour_a[stage][j][timestep],orientation) 
             
         # Subgoal cell
-        # if self.current_subgoal_index == 0:
-        #     for i in range(len(self.current_subgoal)):
-        #         p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index][i]],\
-        #                             -1,rgbaColor=[1, 1, 1, 1])
-        # elif self.current_subgoal_index == 1:
-        #     for i in range(len(self.current_subgoal)):
-        #         p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index-1][i]],\
-        #                             -1,rgbaColor=[0, 0, 1, 1])
-        #     for i in range(len(self.current_subgoal)):
-        #         p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index][i]],\
-        #                             -1,rgbaColor=[1, 1, 1, 1])
-        # else:
-        #     p.changeVisualShape(agent[1],-1,rgbaColor=[1, 1, 1, 1])
+        if self.current_subgoal_index == 0:
+            for i in range(len(self.current_subgoal)):
+                p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index][i]],\
+                                    -1,rgbaColor=[1, 1, 1, 1])
+        elif self.current_subgoal_index == 1:
+            for i in range(len(self.current_subgoal)):
+                p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index-1][i]],\
+                                    -1,rgbaColor=[0, 0, 1, 1])
+            for i in range(len(self.current_subgoal)):
+                p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index][i]],\
+                                    -1,rgbaColor=[1, 1, 1, 1])
+        else:
+            p.changeVisualShape(agent[1],-1,rgbaColor=[1, 1, 1, 1])
 
 
         # #Enable rendering
         # _,_,_,_,_,_,_,_,yaw,pitch,dist,target = p.getDebugVisualizerCamera()
         # print("yaw = {},pitch = {},dist = {},target = {}".format(yaw,pitch,dist,target))
         p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 1)
-        # p.configureDebugVisualizer(p.COV_ENABLE_GUI, 1)
-        # p.configureDebugVisualizer(p.COV_ENABLE_TINY_RENDERER, 1)
         img_arr = p.getCameraImage(img_resolution,img_resolution)
         rgb = img_arr[2][img_start:img_end, img_start:img_end]
         depth = img_arr[3][img_start:img_end, img_start:img_end]
         depth_map = depth_conversion(depth)
         gray = rgb2gray(rgb)
-        plt.figure(1)
-        plt.title("64*64 Grey scale image")
-        image = plt.imshow(gray, cmap='Greys_r')
-        plt.figure(2)
-        plt.title("64*64 Depth image")
-        image = plt.imshow(depth,cmap='Greys_r')   # twilight_r
-        print("stage%d"%(stage*10+timestep))
+        # plt.figure(1)
+        # plt.title("64*64 Grey scale image")
+        # image = plt.imshow(gray, cmap='Greys_r')
+        # plt.figure(2)
+        # plt.title("64*64 Depth image")
+        # image = plt.imshow(depth,cmap='Greys_r')   # twilight_r
+        # print("stage%d"%(stage*10+timestep))
     
         return [gray,depth_map]
     
 
 
 if __name__ == '__main__':
-    env = EmbryoBulletEnv('gui')
+    env = EmbryoBulletEnv('gui',embryo_num = 1)
     # np.save('original_AI_location',env.pos_interpolations_target_a[:,0,:])
     # np.save('original_target_location',env.pos_interpolations_target_a[:,1,:])
-    
     plt.ion()
-
     for i_episode in range(10):
         env.reset([NEIGHBOR_CANDIDATE_1,NEIGHBOR_CANDIDATE_2])
         counter = 0
         r_overall = 0
         while True:
             image = env.render()
-            a = np.random.randint(8)
+            # a = np.random.randint(8)
+            a = 1
             s_, r, done, sg_done = env.step(a)
+            print(r, done, sg_done)
             counter += 1
             r_overall += r
             if done:
                 break
         print('Episode:', i_episode, 'Done in', counter, 'steps. Reward:',r_overall)
-    
     env.close()

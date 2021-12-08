@@ -75,10 +75,10 @@ def demo_run():
     print('\nCollecting experience...')
 
     for i_episode in range(len(subgoals)):
-        # if i_episode % 150 == 149:
-        #     dqn.e_greedy += 0.05
-        #     if dqn.e_greedy > 0.95:
-        #         dqn.e_greedy = 0.95
+        if i_episode % 150 == 149:
+            dqn.e_greedy += 0.05
+            if dqn.e_greedy > 0.95:
+                dqn.e_greedy = 0.95
         # sg = subgoals[i_episode]
         # env.subgoals[0] = sg[0]
         # env.subgoals[1] = sg[1]

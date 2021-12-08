@@ -43,13 +43,15 @@ class EmbryoAgent():
         return observation
 
 if __name__ == '__main__':
+    import os,inspect
+    currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    parentdir = os.path.dirname(os.path.dirname(currentdir))
     p.connect(p.DIRECT)
-    p.loadMJCF('./Embryo/utils/agent.xml')
+    p.loadMJCF(parentdir+ '/Embryo/utils/agent.xml')
     print("\nTesting...")
-    agent = EmbryoAgent(0,0)
+    agent = EmbryoAgent(0,0,'Cpaaa')
     ai_speed = agent.apply_action(1)
     obs = agent.get_observation()
-    print(type(ai_speed),type(obs))
     print("ai_speed:{}".format(ai_speed))
     print("observation:{}".format(obs))
     print("\nProcess Completed\n")
