@@ -253,13 +253,13 @@ class EmbryoBulletEnv(gym.Env):
                     else:
                         id = int(vec[0])
                         #pixels as unit of each location
-                        # location = np.array([(float(vec[5])), \
-                        #                     (float(vec[6])), \
-                        #                     (float(vec[7]) / self.plane_resolution)])
-                        
                         location = np.array([(float(vec[5])), \
                                             (float(vec[6])), \
-                                            (float(vec[7]) * 5.0)])
+                                            (float(vec[7]) / self.plane_resolution)])
+                        
+                        # location = np.array([(float(vec[5])), \
+                        #                     (float(vec[6])), \
+                        #                     (float(vec[7]) * 5.0)])
                         # #um as unit of each location
                         # location = np.array([(float(vec[5]) * self.plane_resolution), \
                         #                     (float(vec[6]) * self.plane_resolution), \
@@ -484,6 +484,7 @@ class EmbryoBulletEnv(gym.Env):
         stage = self.ticks // 10
         timestep = self.ticks % 10
         s = self.ai.get_observation()
+        print(s)
         self.ai_locations.append(s[:3])
         self.target_locations.append(self.pos_interpolations_target_a[stage][1,timestep].tolist())
         for pos in self.pos_interpolations_neighbour_a[stage][:,timestep]:
