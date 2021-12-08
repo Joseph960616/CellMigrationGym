@@ -7,11 +7,9 @@ os.sys.path.insert(0, parentdir)
 
 import matplotlib.pyplot as plt
 import _pickle as pickle
-from PIL import Image
 import numpy as np
 import pybullet as p
-import gym, cv2
-from random import random
+import gym
 from Embryo.env.Embryo_agent import EmbryoAgent
 from Embryo.utils.utils import rgb2gray, gray2twobit, depth_conversion
 from Embryo.utils.embryo import Embryo
@@ -256,10 +254,6 @@ class EmbryoBulletEnv(gym.Env):
                         location = np.array([(float(vec[5])), \
                                             (float(vec[6])), \
                                             (float(vec[7]) / self.plane_resolution)])
-                        
-                        # location = np.array([(float(vec[5])), \
-                        #                     (float(vec[6])), \
-                        #                     (float(vec[7]) * 5.0)])
                         # #um as unit of each location
                         # location = np.array([(float(vec[5]) * self.plane_resolution), \
                         #                     (float(vec[6]) * self.plane_resolution), \
