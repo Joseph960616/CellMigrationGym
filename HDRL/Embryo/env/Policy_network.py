@@ -36,7 +36,7 @@ MEMORY_CAPACITY = 8000
 # TARGET_REPLACE_ITER = 1000      # target update frequency
 # MEMORY_CAPACITY = 4000
 
-N_CHANNEL = 1
+N_CHANNEL = 2
 N_INPUT = 1
 INPUT_SIZE = 64
 N_STATES_CNN = INPUT_SIZE * INPUT_SIZE * N_CHANNEL * N_INPUT
@@ -172,82 +172,6 @@ class DQN(object):
         return loss.data.cpu().numpy()
 
 
-# class DQN(object):
-#     def __init__(self):
-#         if use_cuda:
-#             self.eval_net, self.target_net = Net().cuda(), Net().cuda()
-#         else:
-#             self.eval_net, self.target_net = Net(), Net()
-#         self.e_greedy = EPSILON
-#         self.learning_rate = LR
-#         self.learn_step_counter = 0                                     # for target updating
-#         self.memory_counter = 0                                         # for storing memory
-#         self.memory = np.zeros((MEMORY_CAPACITY, N_STATES * 2 + 3))     # initialize memory
-#         self.optimizer = torch.optim.Adam(self.eval_net.parameters(), lr=self.learning_rate)
-#         self.loss_func = nn.MSELoss()
-
-#     def choose_action(self, x):
-        
-#         if use_cuda:
-#             x = Variable(torch.unsqueeze(torch.FloatTensor(x), 0).cuda())
-#         else:
-#             x = Variable(torch.unsqueeze(torch.FloatTensor(x), 0))
-#         # input only one sample
-#         if np.random.uniform() < self.e_greedy:   # greedy
-#             actions_value = self.eval_net.forward(x)
-#             if use_cuda:
-#                 action = torch.max(actions_value, 1)[1].data.cpu().numpy()[0]
-#             else:
-#                 action = torch.max(actions_value, 1)[1].data.numpy()[0]     # return the argmax
-
-#         else:   # random
-#             action = np.random.randint(0, N_ACTIONS)
-#         return action
-
-#     def store_transition(self, s, t, a, r, s_):
-#         transition = np.hstack((s, [t, a, r], s_))
-#         # replace the old memory with new memory
-#         index = self.memory_counter % MEMORY_CAPACITY
-#         self.memory[index, :] = transition
-#         self.memory_counter += 1
-
-#     def learn(self):
-#         # target parameter update
-#         if self.learn_step_counter % TARGET_REPLACE_ITER == 0:
-#             self.target_net.load_state_dict(self.eval_net.state_dict())
-#             print('Parameters updated')
-#         self.learn_step_counter += 1
-
-#         # sample batch transitions
-#         sample_index = np.random.choice(MEMORY_CAPACITY, BATCH_SIZE)
-#         b_memory = self.memory[sample_index, :]
-
-#         if use_cuda:
-#             b_s = Variable(torch.FloatTensor(b_memory[:, :N_STATES]).cuda())
-#             b_t = Variable(torch.LongTensor(b_memory[:, N_STATES:N_STATES+1].astype(int)).cuda())
-#             b_a = Variable(torch.LongTensor(b_memory[:, N_STATES+1:N_STATES+2].astype(int)).cuda())
-#             b_r = Variable(torch.FloatTensor(b_memory[:, N_STATES+2:N_STATES+3]).cuda())
-#             b_s_ = Variable(torch.FloatTensor(b_memory[:, -N_STATES:]).cuda())
-#         else:
-            
-#             b_s = Variable(torch.FloatTensor(b_memory[:, :N_STATES]))
-#             b_t = Variable(torch.LongTensor(b_memory[:, N_STATES:N_STATES+1].astype(int)))
-#             b_a = Variable(torch.LongTensor(b_memory[:, N_STATES+1:N_STATES+2].astype(int)))
-#             b_r = Variable(torch.FloatTensor(b_memory[:, N_STATES+2:N_STATES+3]))
-#             b_s_ = Variable(torch.FloatTensor(b_memory[:, -N_STATES:]))
-
-#         # q_eval w.r.t the action in experience
-#         q_eval = self.eval_net(b_s).gather(1, b_a)  # shape (batch, 1)
-#         q_next = self.target_net(b_s_).detach()     # detach from graph, don't backpropagate
-#         q_target = b_r + GAMMA * q_next.max(1)[0].view(BATCH_SIZE, 1)   # shape (batch, 1)
-#         loss = self.loss_func(q_eval, q_target)
-
-#         self.optimizer.zero_grad()
-#         loss.backward()
-#         self.optimizer.step()
-
-#         return loss.data.cpu().numpy()
-
 class DQN_CNN(object):
     def __init__(self):
         if use_cuda:
@@ -263,6 +187,7 @@ class DQN_CNN(object):
         self.loss_func = nn.MSELoss()
 
     def choose_action(self, x):
+        print(np.array(x).shape)
         x = np.reshape(x, (-1,N_CHANNEL*N_INPUT,INPUT_SIZE,INPUT_SIZE))
         # x = Variable(torch.unsqueeze(torch.FloatTensor(x), 0))
         if use_cuda:

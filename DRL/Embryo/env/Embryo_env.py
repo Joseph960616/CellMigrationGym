@@ -15,22 +15,26 @@ from Embryo.utils.utils import rgb2gray, gray2twobit, depth_conversion
 from Embryo.utils.embryo import Embryo
 
 NEIGHBOR_MODEL_PATH = parentdir + '/trained_models/neighbor_model.pkl'
+DRL_MODEL_PATH = parentdir + '/trained_models/ll_model.pkl'
+
 #Goal parameters
 AI_CELL = 'Cpaaa'
 TARGET_CELL = 'ABarpaapp'
 
-STATE_CELL_LIST = ['ABarpppap', 'ABarppppa', 'ABarppppp', 'Caaaa', 'ABprapapp', 'Epra', 'ABprapaaa', \
-                                'ABprapaap', 'Cpaap', 'ABprapapa', 'ABarppapp', 'Caaap', 'Eprp', 'ABarpppaa', 'Eplp', \
-                                'ABarppapa', 'Epla', 'ABarppaap']
+STATE_CELL_LIST = ['ABarppaap', 'ABarppapa', 'ABarppapp', 'ABarpppaa', 'ABarpppap', 'ABarppppa',\
+                    'ABarppppp', 'ABprapaaa', 'ABprapaap', 'ABprapapa', 'ABprapapp', 'Caaaa','Caaap',\
+                    'Cpaap', 'Epla', 'Eplp', 'Epra', 'Eprp']
 
 #Pre-define/calculated parameters
 PLANE_RESOLUTION = 0.254
 RADIUS_SCALE_FACTOR = 1.0
 DISTANCE_TRANSPARENT = 40
+np.random.seed(0)
+# EMBRYO_VOLUME_LIST = [2500578.08321, 2818131.28451, 2334542.95732, 3890650.18134,\
+#                         2762373.40873, 2477879.24970, 2653539.39170, 6728081.76875,\
+#                         2327138.18813, 2220084.34469]
+EMBRYO_VOLUME_LIST = [2653539.39170,2327138.18813,2220084.34469]
 
-EMBRYO_VOLUME_LIST = [2500578.08321, 2818131.28451, 2334542.95732, 3890650.18134,\
-                        2762373.40873, 2477879.24970, 2653539.39170, 6728081.76875,\
-                        2327138.18813, 2220084.34469]
 
 #RL related parameters
 SUB_GOAL_TOLERANCE = 5              #need to be tune for different embryo
@@ -52,6 +56,7 @@ class EmbryoBulletEnv(gym.Env):
         self.ticks = 0
         self.stage = 0
         self.embryo_num = embryo_num
+        self.set_seed = self.seed(0)
         self.radius_scale_factor = RADIUS_SCALE_FACTOR
         self.state_cell_list = STATE_CELL_LIST
         self.embryo_volume_list = EMBRYO_VOLUME_LIST
@@ -59,6 +64,7 @@ class EmbryoBulletEnv(gym.Env):
         self.tick_resolution = TICK_RESOLUTION
         self.state_value_dict = {}
         self.neighbor_model = pickle.load(open(NEIGHBOR_MODEL_PATH, 'rb'))
+        self.drl_model = pickle.load(open(DRL_MODEL_PATH, 'rb'))
         self.create(method)
         #Load the world
         self.cell = p.loadMJCF(os.path.join(parentdir,'Embryo/utils/cell_neighbour.xml'))
@@ -82,12 +88,11 @@ class EmbryoBulletEnv(gym.Env):
                                 high = np.array([300,300,100]*(len(self.state_cell_list) + 1), dtype=np.float32))
 
         #Calculating Embryo volume
-        # em = Embryo('/Users/joseph/Documents/UTK/NIH2/WT50_release_revised/zhuo_wt_RW10348/04/nuclei/')
-        # em = Embryo('./Embryo/utils/nuclei/')
+        # em = Embryo(projectdir+'/data/cpaaa_%d/nuclei/')
         # em.read_data()
         # em.get_volume()
         # self.embryo_volume = em.volume
-        ##pre-calculated embryo volume
+        ##pre-calculated embryo volume based on above procedure (saving time)
         self.embryo_volume = self.embryo_volume_list[self.embryo_num]
         #Load nuclei data from 1-200
         self.data_dicts = self.load_data()
@@ -124,7 +129,7 @@ class EmbryoBulletEnv(gym.Env):
 
         p.resetDebugVisualizerCamera(cameraDistance=80, \
                                 cameraYaw=58, \
-                                cameraPitch=0, \
+                                cameraPitch=-90.1, \
                                 cameraTargetPosition=self.pos_interpolations_target_a[0][0,0])
 
         print('\nInitialization finished')

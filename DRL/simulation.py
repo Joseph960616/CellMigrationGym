@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 #env related package
-import gym,pickle,time,itertools
+import gym,pickle,time,itertools,argparse
 import numpy as np
 import pybullet as p
 import Embryo
@@ -47,7 +47,10 @@ else:
 
 
 def demo_run(): 
-    env = gym.make("Embryo-v0",method = RENDER_MODE)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--em", type=int, default=0, help="The index of Cpaaa embryo. choose from [0-2]")
+    args = parser.parse_args()
+    env = gym.make("Embryo-v0", method = RENDER_MODE, embryo_num = args.em)
     dqn = DQN()
     dqn.eval_net.load_state_dict(torch.load('./temp010001000/llmodel_909_succ.pkl', map_location=lambda storage, loc: storage))
     dqn.target_net.load_state_dict(torch.load('./temp010001000/llmodel_909_succ.pkl', map_location=lambda storage, loc: storage))

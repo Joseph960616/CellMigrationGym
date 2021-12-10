@@ -1,9 +1,13 @@
 import numpy as np
-import re
+import re,os,inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(os.path.dirname(currentdir))
+projectdir = os.path.dirname(parentdir)
 
 class Embryo(object):
 	def __init__(self, 
-				file_path='./Embryo/utils/nuclei/', 
+				file_path=projectdir+'/data/cpaaa_%d/nuclei/',
 				start_point=1, 
 				end_point=200, 
 				total_plane=30, 
@@ -164,7 +168,7 @@ class Embryo(object):
 
 
 if __name__ == '__main__':
-	em = Embryo('/Users/joseph/Documents/UTK/NIH2/WT50_release_revised/zhuo_wt_BV82/05/nuclei/')
+	em = Embryo(projectdir+'/data/cpaaa_%d/nuclei/'%2)
 	# em.read_data()
 	# em.get_embryo_visual_params()
 	# em.get_volume()

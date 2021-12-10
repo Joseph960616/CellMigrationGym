@@ -14,14 +14,18 @@ from Embryo.utils.utils import rgb2gray, gray2twobit, depth_conversion
 from Embryo.utils.embryo import Embryo
 
 NEIGHBOR_MODEL_PATH = parentdir + '/trained_models/neighbor_model.pkl'
+LL_MODEL_PATH = parentdir + '/trained_models/hdrl_llmodel.pkl'
+HL_MODEL_PATH = parentdir + '/trained_models/hdrl_hlmodel.pkl'
+
 #Goal parameters
 AI_CELL = 'Cpaaa'
 TARGET_CELL = 'ABarpaapp'
-STATE_CELL_LIST = ['ABarpppap', 'ABarppppa', 'ABarppppp', 'Caaaa', 'ABprapapp', 'Epra', 'ABprapaaa', \
-                                'ABprapaap', 'Cpaap', 'ABprapapa', 'ABarppapp', 'Caaap', 'Eprp', 'ABarpppaa', 'Eplp', \
-                                'ABarppapa', 'Epla', 'ABarppaap']
+STATE_CELL_LIST = ['ABarppaap', 'ABarppapa', 'ABarppapp', 'ABarpppaa', 'ABarpppap', 'ABarppppa',\
+                    'ABarppppp', 'ABprapaaa', 'ABprapaap', 'ABprapapa', 'ABprapapp', 'Caaaa','Caaap',\
+                    'Cpaap', 'Epla', 'Eplp', 'Epra', 'Eprp']
 
-NEIGHBOR_CANDIDATE_1 = ['ABarppppa', 'ABarppapp']
+# NEIGHBOR_CANDIDATE_1 = ['ABarppppa', 'ABarppapa']
+NEIGHBOR_CANDIDATE_1 = ['ABarppapp', 'ABarppppa']
 NEIGHBOR_CANDIDATE_2 = ['ABarpppap', 'ABarppapa']
 NEIGHBOR_CANDIDATE_3 = ['ABarpppaa', 'ABarppaap']
 #n1: ABarppapp; n2: ABarppppa; n3: ABarppapa; n4: ABarpppap; n5: ABarppaap; n6: ABarpppaa
@@ -32,9 +36,7 @@ RADIUS_SCALE_FACTOR = 1.0
 DISTANCE_TRANSPARENT = 40
 np.random.seed(0)
 
-EMBRYO_VOLUME_LIST = [2500578.08321, 2818131.28451, 2334542.95732, 3890650.18134,\
-                        2762373.40873, 2477879.24970, 2653539.39170, 6728081.76875,\
-                        2327138.18813, 2220084.34469]
+EMBRYO_VOLUME_LIST = [2653539.39170,2327138.18813,2220084.34469]
 
 #Render related parameters
 TICK_RESOLUTION = 10
@@ -52,7 +54,7 @@ class EmbryoBulletEnv(gym.Env):
         self.stage = 0
         self.current_subgoal_index = 0
         self.embryo_num = embryo_num
-        self.set_seed = self.seed(1)
+        self.set_seed = self.seed(0)
         self.radius_scale_factor = RADIUS_SCALE_FACTOR
         self.state_cell_list = STATE_CELL_LIST
         self.embryo_volume_list = EMBRYO_VOLUME_LIST
@@ -61,6 +63,8 @@ class EmbryoBulletEnv(gym.Env):
         self.time_step = TIME_STEP
         self.state_value_dict = {}
         self.neighbor_model = pickle.load(open(NEIGHBOR_MODEL_PATH, 'rb'))
+        self.ll_model = pickle.load(open(LL_MODEL_PATH, 'rb'))
+        self.hl_model = pickle.load(open(HL_MODEL_PATH, 'rb'))
         self.create(method)
         #Load the world
         self.cell = p.loadMJCF(os.path.join(parentdir,'Embryo/utils/cell_neighbour.xml'))
@@ -85,12 +89,11 @@ class EmbryoBulletEnv(gym.Env):
                                 high = np.array([300,300,100]*(len(self.state_cell_list) + 1), dtype=np.float32))
 
         #Calculating Embryo volume
-        # em = Embryo('/Users/joseph/Documents/UTK/NIH2/WT50_release_revised/zhuo_wt_RW10348/04/nuclei/')
-        # em = Embryo('./Embryo/utils/nuclei/')
+        # em = Embryo(projectdir+'/data/cpaaa_%d/nuclei/')
         # em.read_data()
         # em.get_volume()
         # self.embryo_volume = em.volume
-        ##pre-calculated embryo volume
+        ##pre-calculated embryo volume based on above procedure (saving time)
         self.embryo_volume = self.embryo_volume_list[self.embryo_num]
         #Load nuclei data from 1-200
         self.data_dicts = self.load_data()
@@ -104,10 +107,8 @@ class EmbryoBulletEnv(gym.Env):
             self.interpolation(self.cell_name_neighbour_a, self.pos_neighbour_a,self.tick_resolution)
         self.pos_interpolations_target_a,self.cell_name_interpolations_target_a = \
             self.interpolation(self.cell_name_target_a, self.pos_target_a,self.tick_resolution)
-        
         #re-arranged state cell name
         self.state_cell_list = np.array(self.cell_name_interpolations_neighbour_a[0][:,0]) 
-
         #Reward related parameters
         self.neighbor_goal_counter = 0
         self.neighbor_goal_achieved_num = 5
@@ -122,11 +123,11 @@ class EmbryoBulletEnv(gym.Env):
         
         self.ai_begin_reward_dist = ai2traget_dist_begin * 0.9
         self.ai_target_tolerance = ai2traget_dist_end * 1.1
-        self.ai.speed_base = (ai2traget_dist_begin - ai2traget_dist_end) / (self.end_tick * 2)
+        self.ai.speed_base = (ai2traget_dist_begin - ai2traget_dist_end) / (self.end_tick)
         print("AI base speed: %f" % self.ai.speed_base)
 
         p.resetDebugVisualizerCamera(cameraDistance=80, \
-                                cameraYaw=180, \
+                                cameraYaw=0, \
                                 cameraPitch=-90.01, \
                                 cameraTargetPosition=self.pos_interpolations_target_a[0][0,0])
         print('\nInitialization finished')
@@ -515,9 +516,10 @@ class EmbryoBulletEnv(gym.Env):
         sg_done = False
         stage = self.ticks // 10
         timestep = self.ticks % 10
-        self.ai.apply_action(action)                #apply action to agent
-        p.stepSimulation()                          #step the simulation
-        s_ = self.get_state()                       #get next state(location) of agent and all observation cell
+        self.ai.apply_action(action)
+        # p.stepSimulation()
+        s_ = self.get_state()
+        # s_ = self.render()
         self.ticks += 1
 
         #neighbour model
@@ -591,6 +593,7 @@ class EmbryoBulletEnv(gym.Env):
         self.ai_locations = []
         self.target_locations = []
         s = self.get_state()
+        # s = self.render()
 
         return s
 
@@ -632,6 +635,8 @@ class EmbryoBulletEnv(gym.Env):
 
         #Target cell
         p.resetBasePositionAndOrientation(agent[1],self.pos_interpolations_target_a[stage][1][timestep],orientation)
+        p.resetBasePositionAndOrientation(agent[0],self.pos_interpolations_target_a[stage][0][timestep],orientation)
+
         for j in range(len(self.cell_name_interpolations_neighbour_a[stage])):
             #Observational state cell
             p.resetBasePositionAndOrientation(cell[j],self.pos_interpolations_neighbour_a[stage][j][timestep],orientation) 
@@ -642,14 +647,24 @@ class EmbryoBulletEnv(gym.Env):
                 p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index][i]],\
                                     -1,rgbaColor=[1, 1, 1, 1])
         elif self.current_subgoal_index == 1:
+            for i in range(len(self.subgoals[self.current_subgoal_index-1])):
+                p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index-1][i]],\
+                                    -1,rgbaColor=[0, 0, 1, 1])
             for i in range(len(self.current_subgoal)):
+                p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index][i]],\
+                                    -1,rgbaColor=[1, 1, 1, 1])
+        elif self.current_subgoal_index == 2:
+            for i in range(len(self.subgoals[self.current_subgoal_index-1])):
                 p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index-1][i]],\
                                     -1,rgbaColor=[0, 0, 1, 1])
             for i in range(len(self.current_subgoal)):
                 p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index][i]],\
                                     -1,rgbaColor=[1, 1, 1, 1])
         else:
-            p.changeVisualShape(agent[1],-1,rgbaColor=[1, 1, 1, 1])
+            for i in range(len(self.subgoals[self.current_subgoal_index-1])):
+                p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index-1][i]],\
+                                    -1,rgbaColor=[0, 0, 1, 1])
+            # p.changeVisualShape(agent[1],-1,rgbaColor=[1, 1, 1, 1])
 
 
         # #Enable rendering
@@ -679,16 +694,16 @@ if __name__ == '__main__':
     # np.save('original_target_location',env.pos_interpolations_target_a[:,1,:])
     plt.ion()
     for i_episode in range(10):
-        env.reset([NEIGHBOR_CANDIDATE_1,NEIGHBOR_CANDIDATE_2])
+        env.reset([NEIGHBOR_CANDIDATE_1,NEIGHBOR_CANDIDATE_2,NEIGHBOR_CANDIDATE_3])
         counter = 0
         r_overall = 0
         while True:
-            image = env.render()
+            # image = env.render()
             # a = np.random.randint(8)
-            a = 1
+            a = 0
             s_, r, done, sg_done = env.step(a)
-            print(r, done, sg_done)
-            counter += 1
+            if sg_done:
+                counter += 1
             r_overall += r
             if done:
                 break
