@@ -19,7 +19,7 @@ matplotlib                3.3.3<br />
 ----./DRL/trained_models/neighbor_model.pkl: checkpoint of the trained Neighbor Relationship Model<br />
 
 ./HDRL:folder for DRL related model and data<br />
---./HDRL/Embryo: environment for HDRL
+--./HDRL/Embryo: environment for HDRL<br />
 --./HDRL/saved_data/: folder that used for saving the output data when exploring the successful scenarios for HDRL.<br />
 --./HDRL/trained_models/:folder with all the pre-trained HDRL models.<br />
 ----./HDRL/trained_models/hdrl_llmodel.pkl: checkpoint of the trained lower-level HDQN<br />
@@ -28,10 +28,10 @@ matplotlib                3.3.3<br />
 
 ./data/: folder with textual data of nuclei<br />
 --./data/data_description.txt: a brief description of the input textual embryonic data.<br />
---./data/Cpaaa_[0-2]: embryonic data for Cpaaa migration training and evaluation.<br />
+--./data/Cpaaa_[0-2]: textual embryonic data of nuclei for Cpaaa migration training and evaluation.<br />
 
 ./observation:data with textual data of nuclei for observational purpose<br />
---./observation/embryo_data:data with textual data of nuclei for observational purpose<br />
+--./observation/embryo_data/[01-06]:textual embryonic data of nuclei for observational purpose<br />
 --./observation/saved_data:processed observational data for analysis<br />
 --./observation/observation_analysis.ipynb:observational data analysis for figure 6<br />
 
