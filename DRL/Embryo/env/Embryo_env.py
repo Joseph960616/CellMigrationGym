@@ -15,7 +15,7 @@ from Embryo.utils.utils import rgb2gray, gray2twobit, depth_conversion
 from Embryo.utils.embryo import Embryo
 
 NEIGHBOR_MODEL_PATH = parentdir + '/trained_models/neighbor_model.pkl'
-DRL_MODEL_PATH = parentdir + '/trained_models/ll_model.pkl'
+DRL_MODEL_PATH = parentdir + '/trained_models/drl_model.pkl'
 
 #Goal parameters
 AI_CELL = 'Cpaaa'
@@ -483,7 +483,6 @@ class EmbryoBulletEnv(gym.Env):
         stage = self.ticks // 10
         timestep = self.ticks % 10
         s = self.ai.get_observation()
-        print(s)
         self.ai_locations.append(s[:3])
         self.target_locations.append(self.pos_interpolations_target_a[stage][1,timestep].tolist())
         for pos in self.pos_interpolations_neighbour_a[stage][:,timestep]:
@@ -589,6 +588,8 @@ class EmbryoBulletEnv(gym.Env):
         #                                 cameraTargetPosition=self.ai.get_observation())
         #Target cell
         p.resetBasePositionAndOrientation(agent[1],self.pos_interpolations_target_a[stage][1][timestep],orientation)
+        p.resetBasePositionAndOrientation(agent[0],self.pos_interpolations_target_a[stage][0][timestep],orientation)
+
         for j in range(len(self.cell_name_interpolations_neighbour_a[stage])):
             #Observational state cell
             if self.cell_name_interpolations_neighbour_a[stage][j][timestep] in self.state_cell_list:

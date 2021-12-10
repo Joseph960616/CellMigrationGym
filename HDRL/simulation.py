@@ -105,4 +105,4 @@ if __name__ == '__main__':
     start = time.time()
     demo_run()
     end = time.time()
-    print("\nTraining time : %f " % (end-start))
+    print("\nTotal simulation time : %f " % (end-start))
