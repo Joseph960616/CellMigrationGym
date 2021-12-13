@@ -44,7 +44,6 @@ Explore the successful scenarios with HDRL: Command: ```python3 ./HDRL/simulatio
 Two Files are generated in the 'saved_data' folder after the evaluation:<br />
 **cpaaa_locations.pkl**: location of Cpaaa at each time step.<br />
 **target_locations.pkl**: location of the target cell (ABarpaapp) at each time step.<br />
-
 Two pickle files generated for each run above can be used for data analysis and visualization for figure 7,8 and 10.
 
 # Citation <br />
