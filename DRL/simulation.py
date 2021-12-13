@@ -39,11 +39,7 @@ def demo_run():
     args = parser.parse_args()
     env = gym.make("Embryo-v0", method = RENDER_MODE, embryo_num = args.em)
     dqn = DQN()
-    # dqn.eval_net.load_state_dict(torch.load(DRL_MODEL_PATH, map_location=lambda storage, loc: storage))
 
-    episode_list = []
-    reward_list_print = []
-    reward_draw = 0
     cpaaa_locations = []
     target_locations = []
 

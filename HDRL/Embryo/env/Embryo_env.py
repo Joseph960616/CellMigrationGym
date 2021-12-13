@@ -24,7 +24,6 @@ STATE_CELL_LIST = ['ABarppaap', 'ABarppapa', 'ABarppapp', 'ABarpppaa', 'ABarpppa
                     'ABarppppp', 'ABprapaaa', 'ABprapaap', 'ABprapapa', 'ABprapapp', 'Caaaa','Caaap',\
                     'Cpaap', 'Epla', 'Eplp', 'Epra', 'Eprp']
 
-# NEIGHBOR_CANDIDATE_1 = ['ABarppppa', 'ABarppapa']
 NEIGHBOR_CANDIDATE_1 = ['ABarppapp', 'ABarppppa']
 NEIGHBOR_CANDIDATE_2 = ['ABarpppap', 'ABarppapa']
 NEIGHBOR_CANDIDATE_3 = ['ABarpppaa', 'ABarppaap']
@@ -327,7 +326,6 @@ class EmbryoBulletEnv(gym.Env):
             self.target_last_appear = 0
         
         #find the start/end point of the embryo (starts 15 mins after AI cell born)
-        # self.start_point = max(self.ai_first_appear,self.target_first_appear) + 15
         self.start_point = self.ai_first_appear + 15
         self.end_point = min(self.ai_last_appear,self.target_last_appear)
         if self.end_point - self.start_point > 21:
@@ -432,7 +430,6 @@ class EmbryoBulletEnv(gym.Env):
         ai_radius = self.get_radius(self.ai.name)
         target_location = self.pos_interpolations_target_a\
                             [stage][1,timestep]
-        # print("\nai: {}\ttarget: {}".format(ai_location,target_location))
 
         #Pressure model
         for i in range(len(self.cell_name_interpolations_neighbour_a[stage][:,timestep])):
@@ -453,11 +450,9 @@ class EmbryoBulletEnv(gym.Env):
                     r = -1000
                     done = True
                     return r, sg_done, done
-        # print("pressure model reward: %f" % r)
 
         #Target reach model
         dist2target = np.linalg.norm(target_location - ai_location)
-        # print("\ndist2target: {}".format(dist2target))
         if dist2target < self.ai_begin_reward_dist:
             if dist2target < self.ai_target_tolerance and self.current_subgoal_index == len(self.subgoals):
                 self.goal_counter += 1
@@ -480,10 +475,7 @@ class EmbryoBulletEnv(gym.Env):
             r = 10
             self.subgoal_done_step.append(self.ticks)
             print('Subgoal {}:{} reached'.format(self.current_subgoal_index,self.current_subgoal))
-            # print('Subgoal {}:{} done in {} steps'.format(self.current_subgoal_index,self.current_subgoal,self.ticks))
             return r, sg_done, done
-        # print("\ntarget model reward: %f" % r)
-
         if r == 0:
             r = 1
 
@@ -520,9 +512,7 @@ class EmbryoBulletEnv(gym.Env):
         stage = self.ticks // 10
         timestep = self.ticks % 10
         self.ai.apply_action(action)
-        # p.stepSimulation()
         s_ = self.get_state()
-        # s_ = self.render()
         self.ticks += 1
 
         #neighbour model
@@ -556,10 +546,6 @@ class EmbryoBulletEnv(gym.Env):
             print('Time is up! Goal NOT achieved!')
             r = 0
             done = True
-        # if self.current_subgoal_index == 1 and self.ticks < self.end_tick * 0.4:
-        #     done = True 
-        #     r = 0
-        #     print('Target reached sub-goal #1 too fast!')
         if self.current_subgoal_index == 0 and self.ticks > self.end_tick * 0.6:
             done = True 
             r = 0
@@ -597,7 +583,6 @@ class EmbryoBulletEnv(gym.Env):
         self.ai_locations = []
         self.target_locations = []
         s = self.get_state()
-        # s = self.render()
 
         return s
 
@@ -627,16 +612,6 @@ class EmbryoBulletEnv(gym.Env):
         p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 0)
         p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
         p.configureDebugVisualizer(p.COV_ENABLE_TINY_RENDERER, 0)
-
-        # r_ai_cell = self.radius_target_a[stage][0]
-        # is_neighbour = np.zeros(len(self.cell_name_interpolations_neighbour_a[stage][:,timestep]))
-        # ai_location = self.ai.get_observation()
-        # for m in range(len(self.cell_name_interpolations_neighbour_a[stage][:,timestep])):
-        #     # dist = np.linalg.norm(self.pos_interpolations_target_a[stage][0][timestep]-self.pos_interpolations_neighbour_a[stage][m][timestep])
-        #     dist = np.linalg.norm(ai_location - self.pos_interpolations_neighbour_a[stage][m][timestep])
-        #     r_cell = self.radius_neighbour_a[0][m]
-        #     is_neighbour[m] = self.neighbor_model.predict([[dist, r_ai_cell, r_cell, len(self.pos_interpolations_a[stage][:,timestep])]])
-
         #Target cell
         p.resetBasePositionAndOrientation(agent[1],self.pos_interpolations_target_a[stage][1][timestep],orientation)
         p.resetBasePositionAndOrientation(agent[0],self.pos_interpolations_target_a[stage][0][timestep],orientation)
@@ -690,16 +665,13 @@ class EmbryoBulletEnv(gym.Env):
 
 if __name__ == '__main__':
     env = EmbryoBulletEnv('gui',embryo_num = 0)
-    # np.save('original_AI_location',env.pos_interpolations_target_a[:,0,:])
-    # np.save('original_target_location',env.pos_interpolations_target_a[:,1,:])
     for i_episode in range(10):
         env.reset([NEIGHBOR_CANDIDATE_1,NEIGHBOR_CANDIDATE_2,NEIGHBOR_CANDIDATE_3])
         counter = 0
         r_overall = 0
         while True:
             # image = env.render()
-            # a = np.random.randint(8)
-            a = 0
+            a = np.random.randint(8)
             s_, r, done, sg_done = env.step(a)
             if sg_done:
                 counter += 1

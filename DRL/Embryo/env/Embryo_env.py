@@ -37,8 +37,6 @@ EMBRYO_VOLUME_LIST = [2653539.39170,2327138.18813,2220084.34469]
 
 
 #RL related parameters
-SUB_GOAL_TOLERANCE = 5              #need to be tune for different embryo
-AI_SPEED_PER_MIN = 60                #need to be tune for different embryo
 AI_BEGIN_REWARD = 70
 TICK_RESOLUTION = 10
 
@@ -124,7 +122,6 @@ class EmbryoBulletEnv(gym.Env):
         self.ai_begin_reward_dist = ai2traget_dist_begin * 0.9
         self.ai_target_tolerance = ai2traget_dist_end * 1.1
         self.ai.speed_base = (ai2traget_dist_begin - ai2traget_dist_end) / (self.end_tick * 2)
-        # print(self.ai_begin_reward_dist,self.ai_target_tolerance)
         print("AI base speed: %f" % self.ai.speed_base)
 
 
@@ -329,7 +326,6 @@ class EmbryoBulletEnv(gym.Env):
             self.target_last_appear = 0
         
         #find the start/end point of the embryo (starts 15 mins after AI cell born)
-        # self.start_point = max(self.ai_first_appear,self.target_first_appear) + 15
         self.start_point = self.ai_first_appear + 15
         self.end_point = min(self.ai_last_appear,self.target_last_appear)
         if self.end_point - self.start_point > 23:
@@ -433,10 +429,8 @@ class EmbryoBulletEnv(gym.Env):
         ai_radius = self.get_radius(self.ai.name)
         target_location = self.pos_interpolations_target_a\
                             [stage][1,timestep]
-        # print("\nai: {}\ttarget: {}".format(ai_location,target_location))
         #target reach model
         dist2target = np.linalg.norm(target_location - ai_location)
-        # print("\ndist2target: {}".format(dist2target))
         if dist2target < self.ai_begin_reward_dist:
             r += (self.ai_begin_reward_dist -  dist2target)
             if dist2target < self.ai_target_tolerance:
@@ -453,18 +447,14 @@ class EmbryoBulletEnv(gym.Env):
                             self.ticks = self.tick_num
                     neighbor_goal_counter = 0
                     return r, done
-        # print("target model reward: %f" % r)
-
         #Pressure model
         for i in range(len(self.cell_name_interpolations_neighbour_a[stage][:,timestep])):
             cell_name = self.cell_name_interpolations_neighbour_a[stage][i,timestep]
             if cell_name != self.ai.name:
                 cell_location = self.pos_interpolations_neighbour_a[stage][i,timestep]
                 dist = np.linalg.norm(cell_location - ai_location)
-                # print("\naidist2cell: {}".format(dist))
                 cell_radius = self.get_radius(cell_name)
                 sum_radius = cell_radius + ai_radius
-                # print("sum_radius: {}".format(sum_radius))
                 dead_factor = 0.4
                 ok_factor = 0.7
                 if dist > ok_factor * sum_radius:
@@ -476,7 +466,6 @@ class EmbryoBulletEnv(gym.Env):
                     r = -1000
                     done = True
                     return r, done
-        # print("pressure model reward: %f" % r)
         return r, done
 
     def get_state(self):
@@ -510,7 +499,6 @@ class EmbryoBulletEnv(gym.Env):
         info = None
 
         self.ai.apply_action(action)
-        # p.stepSimulation()
         s_ = self.get_state()
         r, done = self.get_reward()
         self.ticks += 1
@@ -575,15 +563,6 @@ class EmbryoBulletEnv(gym.Env):
         p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 0)
         p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
         p.configureDebugVisualizer(p.COV_ENABLE_TINY_RENDERER, 0)
-
-        # r_ai_cell = self.radius_target_a[stage][0]
-        # is_neighbour = np.zeros(len(self.cell_name_interpolations_neighbour_a[stage][:,timestep]))
-        # ai_location = self.ai.get_observation()
-        # for m in range(len(self.cell_name_interpolations_neighbour_a[stage][:,timestep])):
-        #     dist = np.linalg.norm(ai_location - self.pos_interpolations_neighbour_a[stage][m][timestep])
-        #     r_cell = self.radius_neighbour_a[0][m]
-        #     is_neighbour[m] = self.neighbor_model.predict([[dist, r_ai_cell, r_cell, len(self.pos_interpolations_a[stage][:,timestep])]])
-
         #Target cell
         p.resetBasePositionAndOrientation(agent[1],self.pos_interpolations_target_a[stage][1][timestep],orientation)
         p.resetBasePositionAndOrientation(agent[0],self.pos_interpolations_target_a[stage][0][timestep],orientation)

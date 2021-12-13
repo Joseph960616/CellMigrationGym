@@ -45,20 +45,12 @@ if torch.cuda.is_available():
 else:
     use_cuda = False 
 
-# test_goal = [['ABarppppa', 'ABarppapp'],['ABarpppap', 'ABarppapa'],['ABarpppaa', 'ABarppaap']]
 def demo_run(): 
     parser = argparse.ArgumentParser()
     parser.add_argument("--em", type=int, default=2, help="The index of Cpaaa embryo. choose from [0-2]")
     args = parser.parse_args()
     env = gym.make("Embryo-v0", method = RENDER_MODE, embryo_num = args.em)
     dqn = DQN()
-    # dqn.eval_net.load_state_dict(torch.load(LL_MODEL_PATH, map_location=lambda storage, loc: storage))
-    # dqn.target_net.load_state_dict(torch.load(LL_MODEL_PATH, map_location=lambda storage, loc: storage))
-
-    episode_list = []
-    reward_list_print = []
-    reward_draw = 0
-    episode_subgoal_done_step = []
 
     cpaaa_locations = []
     target_locations = []
@@ -75,7 +67,6 @@ def demo_run():
                 print('Episode {} done in {} steps\n'.format(i_episode,env.ticks))
                 cpaaa_locations.append(env.ai_locations)
                 target_locations.append(env.target_locations)
-                episode_subgoal_done_step.append(env.subgoal_done_step)
                 break
             s = s_
 
