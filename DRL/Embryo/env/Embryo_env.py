@@ -51,6 +51,7 @@ class EmbryoBulletEnv(gym.Env):
         #Initialization
         print('\nInitializing environment...')
         self.data_path = projectdir + '/data/cpaaa_%d/nuclei/t%03d-nuclei'
+        print("self.data_path ",self.data_path % (0,0))
         self.start_point = 0
         self.end_point = 0
         self.ticks = 0
@@ -96,7 +97,7 @@ class EmbryoBulletEnv(gym.Env):
         self.embryo_volume = self.embryo_volume_list[self.embryo_num]
         #Load nuclei data from 1-200
         self.data_dicts = self.load_data()
-        self.end_tick = (self.end_point - self.start_point) * self.tick_resolution - 10
+        self.end_tick = (self.end_point - self.start_point) * self.tick_resolution - 11
         print("start point: %d\nend point: %d\n" %(self.start_point,self.end_point ))
     
 
@@ -112,7 +113,7 @@ class EmbryoBulletEnv(gym.Env):
 
         #Reward related parameters
         self.neighbor_goal_counter = 0
-        self.neighbor_goal_achieved_num = 3
+        self.neighbor_goal_achieved_num = 40
         ai2traget_dist_begin = np.linalg.norm(self.pos_interpolations_target_a[0][0,0] - \
                                                     self.pos_interpolations_target_a[0][1,0])
         ai2traget_dist_end = np.linalg.norm(self.pos_interpolations_target_a[-1][0,0] - \
@@ -128,7 +129,7 @@ class EmbryoBulletEnv(gym.Env):
 
 
         p.resetDebugVisualizerCamera(cameraDistance=80, \
-                                cameraYaw=58, \
+                                cameraYaw=0, \
                                 cameraPitch=-90.1, \
                                 cameraTargetPosition=self.pos_interpolations_target_a[0][0,0])
 
@@ -331,8 +332,8 @@ class EmbryoBulletEnv(gym.Env):
         # self.start_point = max(self.ai_first_appear,self.target_first_appear) + 15
         self.start_point = self.ai_first_appear + 15
         self.end_point = min(self.ai_last_appear,self.target_last_appear)
-        if self.end_point - self.start_point > 22:
-            self.end_point = self.start_point + 22
+        if self.end_point - self.start_point > 23:
+            self.end_point = self.start_point + 23
 
         #observation data for all cell
         self.pos_a = np.array(pos_a[self.start_point:self.end_point],dtype=object)
@@ -436,9 +437,9 @@ class EmbryoBulletEnv(gym.Env):
         #target reach model
         dist2target = np.linalg.norm(target_location - ai_location)
         # print("\ndist2target: {}".format(dist2target))
-        if dist2target < self.ai_begin_reward_dist:                     #when getting near
+        if dist2target < self.ai_begin_reward_dist:
             r += (self.ai_begin_reward_dist -  dist2target)
-            if dist2target < self.ai_target_tolerance:                  #when reached
+            if dist2target < self.ai_target_tolerance:
                 self.neighbor_goal_counter += 1
                 if self.neighbor_goal_counter == self.neighbor_goal_achieved_num:
                     done = True
@@ -451,8 +452,8 @@ class EmbryoBulletEnv(gym.Env):
                     neighbor_goal_counter = 0
                     return r, done
         # print("target model reward: %f" % r)
-        ######### pressure with other cells control rule ################
-        ######### (1) dist>0.6*r, ok  (2)0.3*r<dist<0.6*r, bad    (3)dist<0.3*r, dead
+
+        #Pressure model
         for i in range(len(self.cell_name_interpolations_neighbour_a[stage][:,timestep])):
             cell_name = self.cell_name_interpolations_neighbour_a[stage][i,timestep]
             if cell_name != self.ai.name:
@@ -467,7 +468,7 @@ class EmbryoBulletEnv(gym.Env):
                 if dist > ok_factor * sum_radius:
                     r += 0
                 elif dist > dead_factor * sum_radius and dist <= ok_factor * sum_radius:
-                    r += (ok_factor - float(dist) / sum_radius) / (dead_factor - ok_factor)		## 0.4->-1, 0.6->0
+                    r += (ok_factor - float(dist) / sum_radius) / (dead_factor - ok_factor)
                 elif dist < dead_factor * sum_radius:
                     print('hit other cell:', cell_name)
                     r = -1000
@@ -506,11 +507,10 @@ class EmbryoBulletEnv(gym.Env):
         sg_done = False
         info = None
 
-        self.ai.apply_action(action)        #apply action to agent
-        p.stepSimulation()                  #step the simulation
-        s_ = self.get_state()               #get next state(location) of agent and all observation cell
-        r, done = self.get_reward()         #calculate reward
-
+        self.ai.apply_action(action)
+        # p.stepSimulation()
+        s_ = self.get_state()
+        r, done = self.get_reward()
         self.ticks += 1
         if self.ticks == self.end_tick:
             print('Time is up! Goal NOT achieved!')
@@ -579,13 +579,7 @@ class EmbryoBulletEnv(gym.Env):
         #     dist = np.linalg.norm(ai_location - self.pos_interpolations_neighbour_a[stage][m][timestep])
         #     r_cell = self.radius_neighbour_a[0][m]
         #     is_neighbour[m] = self.neighbor_model.predict([[dist, r_ai_cell, r_cell, len(self.pos_interpolations_a[stage][:,timestep])]])
-        #AI cell
-        # Observation data
-        # p.resetBasePositionAndOrientation(agent[0],self.pos_interpolations_target_a[stage][0][timestep],orientation)
-        # p.resetDebugVisualizerCamera(cameraDistance=80, \
-        #                                 cameraYaw=58, \
-        #                                 cameraPitch=-90.01, \
-        #                                 cameraTargetPosition=self.ai.get_observation())
+
         #Target cell
         p.resetBasePositionAndOrientation(agent[1],self.pos_interpolations_target_a[stage][1][timestep],orientation)
         p.resetBasePositionAndOrientation(agent[0],self.pos_interpolations_target_a[stage][0][timestep],orientation)
@@ -597,7 +591,6 @@ class EmbryoBulletEnv(gym.Env):
 
         # #Enable rendering
         p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 1)
-
         img_arr = p.getCameraImage(img_resolution,img_resolution)
         rgb = img_arr[2][img_start:img_end, img_start:img_end]
         depth = img_arr[3][img_start:img_end, img_start:img_end]
@@ -615,7 +608,7 @@ class EmbryoBulletEnv(gym.Env):
 
 
 if __name__ == '__main__':
-    env = EmbryoBulletEnv('gui',embryo_num = 2)
+    env = EmbryoBulletEnv('gui',embryo_num = 0)
     plt.ion()
 
     for i_episode in range(10):

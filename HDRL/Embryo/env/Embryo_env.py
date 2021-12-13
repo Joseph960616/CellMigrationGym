@@ -48,6 +48,7 @@ class EmbryoBulletEnv(gym.Env):
         #Initialization
         print('\nInitializing environment...')
         self.data_path = projectdir + '/data/cpaaa_%d/nuclei/t%03d-nuclei'
+        print("self.data_path ",self.data_path % (0,0))
         self.start_point = 0
         self.end_point = 0
         self.ticks = 0
@@ -329,8 +330,8 @@ class EmbryoBulletEnv(gym.Env):
         # self.start_point = max(self.ai_first_appear,self.target_first_appear) + 15
         self.start_point = self.ai_first_appear + 15
         self.end_point = min(self.ai_last_appear,self.target_last_appear)
-        if self.end_point - self.start_point > 23:
-            self.end_point = self.start_point + 23
+        if self.end_point - self.start_point > 21:
+            self.end_point = self.start_point + 21
 
         #observation data for all cell
         self.pos_a = np.array(pos_a[self.start_point:self.end_point],dtype=object)
@@ -457,17 +458,16 @@ class EmbryoBulletEnv(gym.Env):
         #Target reach model
         dist2target = np.linalg.norm(target_location - ai_location)
         # print("\ndist2target: {}".format(dist2target))
-        if dist2target < self.ai_begin_reward_dist:                 #when getting near
-            # r += (self.ai_begin_reward_dist -  dist2target)
+        if dist2target < self.ai_begin_reward_dist:
             if dist2target < self.ai_target_tolerance and self.current_subgoal_index == len(self.subgoals):
                 self.goal_counter += 1
-                if self.goal_counter == self.goal_achieved_num:     #when reached
+                if self.goal_counter == self.goal_achieved_num:
                     done = True
                     self.goal_counter = 0
-                    if self.ticks < self.end_tick * 0.9:
+                    if self.ticks < self.end_tick * 0.7:
                         r = 0
                         print('Target reached too fast!')
-                    else:                                   #reached target
+                    else:
                         r = 100
                         self.subgoal_done_step.append(self.ticks)
                         print("Target successfully reached!")
@@ -477,7 +477,8 @@ class EmbryoBulletEnv(gym.Env):
             sg_done = True
             r = 10
             self.subgoal_done_step.append(self.ticks)
-            print('Subgoal {}:{} done in {} steps'.format(self.current_subgoal_index,self.current_subgoal,self.ticks))
+            print('Subgoal {}:{} reached'.format(self.current_subgoal_index,self.current_subgoal))
+            # print('Subgoal {}:{} done in {} steps'.format(self.current_subgoal_index,self.current_subgoal,self.ticks))
             return r, sg_done, done
         # print("\ntarget model reward: %f" % r)
 
@@ -664,12 +665,8 @@ class EmbryoBulletEnv(gym.Env):
             for i in range(len(self.subgoals[self.current_subgoal_index-1])):
                 p.changeVisualShape(cell[self.subgoal_name_index[self.current_subgoal_index-1][i]],\
                                     -1,rgbaColor=[0, 0, 1, 1])
-            # p.changeVisualShape(agent[1],-1,rgbaColor=[1, 1, 1, 1])
-
 
         # #Enable rendering
-        # _,_,_,_,_,_,_,_,yaw,pitch,dist,target = p.getDebugVisualizerCamera()
-        # print("yaw = {},pitch = {},dist = {},target = {}".format(yaw,pitch,dist,target))
         p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 1)
         img_arr = p.getCameraImage(img_resolution,img_resolution)
         rgb = img_arr[2][img_start:img_end, img_start:img_end]
@@ -689,10 +686,9 @@ class EmbryoBulletEnv(gym.Env):
 
 
 if __name__ == '__main__':
-    env = EmbryoBulletEnv('gui',embryo_num = 1)
+    env = EmbryoBulletEnv('gui',embryo_num = 0)
     # np.save('original_AI_location',env.pos_interpolations_target_a[:,0,:])
     # np.save('original_target_location',env.pos_interpolations_target_a[:,1,:])
-    plt.ion()
     for i_episode in range(10):
         env.reset([NEIGHBOR_CANDIDATE_1,NEIGHBOR_CANDIDATE_2,NEIGHBOR_CANDIDATE_3])
         counter = 0

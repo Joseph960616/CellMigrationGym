@@ -35,7 +35,7 @@ else:
 
 def demo_run(): 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--em", type=int, default=0, help="The index of Cpaaa embryo. choose from [0-2]")
+    parser.add_argument("--em", type=int, default=1, help="The index of Cpaaa embryo. choose from [0-2]")
     args = parser.parse_args()
     env = gym.make("Embryo-v0", method = RENDER_MODE, embryo_num = args.em)
     dqn = DQN()
@@ -56,18 +56,16 @@ def demo_run():
                 dqn.e_greedy = 0.95
         s = env.reset()
         ep_r = 0
-        counter = 0
 
         while True:
             env.render()
             a = dqn.choose_action(s)
             s_, r, done, info = env.step(a)             #take action
             # dqn.store_transition(s, a, r, s_)           #store parameters
-            counter += 1
             ep_r += r
 
             if done:
-                print('Episode:', i_episode, 'Done in', counter, 'steps. Reward:',ep_r)
+                print('Episode:', i_episode, 'Done in', env.ticks, 'steps. Reward:',ep_r)
                 cpaaa_locations.append(env.ai_locations)
                 target_locations.append(env.target_locations)
                 break
@@ -85,10 +83,6 @@ def demo_run():
     
     # with open('./target_locations_predict.pkl', 'wb') as f:
     #     pickle.dump(target_locations, f)
-    
-    # with open('./episode_reward_list_predict.pkl', 'wb') as f:
-    #     pickle.dump((episode_list,reward_list_print), f)
-        
 
 if __name__ == '__main__':
     start = time.time()

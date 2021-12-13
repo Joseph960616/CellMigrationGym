@@ -48,7 +48,7 @@ else:
 # test_goal = [['ABarppppa', 'ABarppapp'],['ABarpppap', 'ABarppapa'],['ABarpppaa', 'ABarppaap']]
 def demo_run(): 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--em", type=int, default=0, help="The index of Cpaaa embryo. choose from [0-2]")
+    parser.add_argument("--em", type=int, default=2, help="The index of Cpaaa embryo. choose from [0-2]")
     args = parser.parse_args()
     env = gym.make("Embryo-v0", method = RENDER_MODE, embryo_num = args.em)
     dqn = DQN()
@@ -65,6 +65,7 @@ def demo_run():
 
     for i_episode in range(len(subgoals)):
         s = env.reset(subgoals = subgoals[i_episode])
+        print(subgoals[0])
         ep_r = 0
 
         while True:
@@ -75,7 +76,7 @@ def demo_run():
             ep_r += r
         
             if done:
-                print('Episode:', i_episode, 'Done in', sum(env.subgoal_done_step[:len(subgoals[i_episode])]), 'steps. Reward:',ep_r)
+                # print('Episode:', i_episode, 'Done in', sum(env.subgoal_done_step[:len(subgoals[i_episode])]), 'steps. Reward:',ep_r)
                 cpaaa_locations.append(env.ai_locations)
                 target_locations.append(env.target_locations)
                 episode_subgoal_done_step.append(env.subgoal_done_step)
@@ -93,9 +94,6 @@ def demo_run():
     
     # with open('./target_locations_predict.pkl', 'wb') as f:
     #     pickle.dump(target_locations, f)
-    
-    # with open('./episode_reward_list_predict.pkl', 'wb') as f:
-    #     pickle.dump((episode_list,reward_list_print), f)
 
     # with open('./episode_subgoal_done_step.pkl', 'wb') as f:
     #     pickle.dump(episode_subgoal_done_step, f)
