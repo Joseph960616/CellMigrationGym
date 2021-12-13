@@ -47,9 +47,8 @@ def demo_run():
     cpaaa_locations = []
     target_locations = []
 
-    print('\nCollecting experience...')
-
-    for i_episode in range(10):
+    for i_episode in range(5):
+        print("Episode:",i_episode)
         if i_episode % 150 == 149:
             dqn.e_greedy += 0.05
             if dqn.e_greedy > 0.95:
