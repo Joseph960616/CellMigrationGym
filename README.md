@@ -13,14 +13,14 @@ matplotlib                3.3.3<br />
 # File structure<br />
 ./DRL: **Folder**  for DRL related model and data<br />
 -- ./Embryo: Environment for DRL.<br />
--- ./saved_data/: **Folder**  that used for saving the output data when exploring the successful scenarios for DRL.Currently stored npy file are used for figure 7<br />
+-- ./saved_data/: **Folder**  that used for saving the output data when exploring the successful scenarios for DRL. &ensp Currently stored npy file are used for figure 7<br />
 -- ./trained_models/: **Folder**  with all the pre-trained DRL models.<br />
 ---- drl_model.pkl: DRL model of the trained DQN<br />
 ---- neighbor_model.pkl: Trained Neighbor Relationship Model<br />
 
 ./HDRL: **Folder** for DRL related model and data.<br />
 --./Embryo: Environment for HDRL.<br />
---./saved_data/: **Folder**  that used for saving the output data when exploring the successful scenarios for HDRL. Currently stored npy file are used for figure 8<br />
+--./saved_data/: **Folder**  that used for saving the output data when exploring the successful scenarios for HDRL. &ensp Currently stored npy file are used for figure 8<br />
 --./trained_models/:**Folder**  with all the pre-trained HDRL models.<br />
 ---- hdrl_llmodel.pkl: Trained lower-level HDQN model.<br />
 ---- hdrl_hlmodel.pkl: Trained  Higher-level HDQN model.<br />
