@@ -4,11 +4,13 @@
 This study presents an open framework, CellMigrationGym, to standardize  the DRL approach to study cell migration and infer the underlying biology. Built upon common packages (OpenAI Gym, PyBullet, and DRL libraries), the CellMigrationGym provides powerful and flexible functions to investigate cell migration behavior. This study also presents a demonstration of CellMigrationGym to investigate a representative cell migration behavior, namely, Cpaaa intercalation. The demonstration reveals technical details of the framework setup, and most importantly, it also displays valuable functions of CellMigrationGym for cell migration study, such as 1) multiple observational data preparation and standardization, 2) different migration mechanisms exploration (such as gradient-driven and collective cell movements associated), and 3) evaluation of neighboring cell’s influence on the cell migration.
 
 # Package Requirements <br />
-gym                       0.18.0 <br />
+gym                       0.18.0<br />
 pybullet                  3.0.8<br />
 pytorch                   0.4.1 <br />
 numpy                     1.19.4<br />
+scipy                     1.7.3<br />
 matplotlib                3.3.3<br />
+sklearn                   0.22<br />
 
 # File structure<br />
 ./DRL: **Folder**  for DRL related model and data<br />

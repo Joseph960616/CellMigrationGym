@@ -49,7 +49,6 @@ class EmbryoBulletEnv(gym.Env):
         #Initialization
         print('\nInitializing environment...')
         self.data_path = projectdir + '/data/cpaaa_%d/nuclei/t%03d-nuclei'
-        print("self.data_path ",self.data_path % (0,0))
         self.start_point = 0
         self.end_point = 0
         self.ticks = 0
