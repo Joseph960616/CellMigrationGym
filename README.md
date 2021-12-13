@@ -1,4 +1,4 @@
-## CellMigrationGym:An Open Deep Reinforcement Learning Framework for Cell Migration Study
+## CellMigrationGym: An Open Deep Reinforcement Learning Framework for Cell Migration Study
 
 # Introduction <br />
 This study presents an open framework, CellMigrationGym, to standardize  the DRL approach to study cell migration and infer the underlying biology. Built upon common packages (OpenAI Gym, PyBullet, and DRL libraries), the CellMigrationGym provides powerful and flexible functions to investigate cell migration behavior. This study also presents a demonstration of CellMigrationGym to investigate a representative cell migration behavior, namely, Cpaaa intercalation. The demonstration reveals technical details of the framework setup, and most importantly, it also displays valuable functions of CellMigrationGym for cell migration study, such as 1) multiple observational data preparation and standardization, 2) different migration mechanisms exploration (such as gradient-driven and collective cell movements associated), and 3) evaluation of neighboring cell’s influence on the cell migration.

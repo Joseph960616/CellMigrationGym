@@ -47,7 +47,7 @@ else:
 
 def demo_run(): 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--em", type=int, default=2, help="The index of Cpaaa embryo. choose from [0-2]")
+    parser.add_argument("--em", type=int, default=0, help="The index of Cpaaa embryo. choose from [0-2]")
     args = parser.parse_args()
     env = gym.make("Embryo-v0", method = RENDER_MODE, embryo_num = args.em)
     dqn = DQN()

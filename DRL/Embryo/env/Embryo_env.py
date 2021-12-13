@@ -328,8 +328,8 @@ class EmbryoBulletEnv(gym.Env):
         #find the start/end point of the embryo (starts 15 mins after AI cell born)
         self.start_point = self.ai_first_appear + 15
         self.end_point = min(self.ai_last_appear,self.target_last_appear)
-        if self.end_point - self.start_point > 23:
-            self.end_point = self.start_point + 23
+        if self.end_point - self.start_point > 21:
+            self.end_point = self.start_point + 21
 
         #observation data for all cell
         self.pos_a = np.array(pos_a[self.start_point:self.end_point],dtype=object)
@@ -588,7 +588,6 @@ class EmbryoBulletEnv(gym.Env):
         # print("stage%d"%(stage*10+timestep))
         return [gray,depth_map]
     
-
 
 if __name__ == '__main__':
     env = EmbryoBulletEnv('gui',embryo_num = 0)

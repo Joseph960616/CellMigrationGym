@@ -64,7 +64,6 @@ def demo_run():
                 break
             s = s_
 
-
     # with open('./cpaaa_locations_predict.pkl', 'wb') as f:
     #     pickle.dump(cpaaa_locations, f)
     

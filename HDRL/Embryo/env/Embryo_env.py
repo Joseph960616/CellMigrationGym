@@ -662,7 +662,6 @@ class EmbryoBulletEnv(gym.Env):
         return [gray,depth_map]
     
 
-
 if __name__ == '__main__':
     env = EmbryoBulletEnv('gui',embryo_num = 0)
     for i_episode in range(10):
