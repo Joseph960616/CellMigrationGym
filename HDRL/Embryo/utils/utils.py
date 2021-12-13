@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.spatial.distance import pdist, squareform
+# from scipy.spatial.distance import pdist, squareform
 
 def rgb2gray(rgb):
     """
@@ -58,11 +58,11 @@ def embryo_volume(data_a):
     
     return max(volume_a)
         
-def maxdistance(data):
-    D = pdist(data)
-    D = squareform(D);
-    N, [I_row, I_col] = np.nanmax(D), np.unravel_index( np.argmax(D), D.shape )
-    return N, [I_row, I_col]
+# def maxdistance(data):
+#     D = pdist(data)
+#     D = squareform(D);
+#     N, [I_row, I_col] = np.nanmax(D), np.unravel_index( np.argmax(D), D.shape )
+#     return N, [I_row, I_col]
             
 
 

@@ -8,7 +8,6 @@ gym                       0.18.0<br />
 pybullet                  3.0.8<br />
 pytorch                   0.4.1 <br />
 numpy                     1.19.4<br />
-scipy                     1.7.3<br />
 matplotlib                3.3.3<br />
 sklearn                   0.22<br />
 
