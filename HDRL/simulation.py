@@ -64,40 +64,26 @@ def demo_run():
     target_locations = []
 
     for i_episode in range(len(subgoals)):
+        print("Episode:",i_episode)
         s = env.reset(subgoals = subgoals[i_episode])
-        print(subgoals[0])
-        ep_r = 0
-
         while True:
             env.render()
             a = dqn.choose_action(s)
             s_, r, done, info = env.step(a)             #take action
-            # dqn.store_transition(s, a, r, s_)           #store parameters
-            ep_r += r
         
             if done:
-                # print('Episode:', i_episode, 'Done in', sum(env.subgoal_done_step[:len(subgoals[i_episode])]), 'steps. Reward:',ep_r)
+                print('Episode {} done in {} steps\n'.format(i_episode,env.ticks))
                 cpaaa_locations.append(env.ai_locations)
                 target_locations.append(env.target_locations)
                 episode_subgoal_done_step.append(env.subgoal_done_step)
                 break
             s = s_
 
-        reward_draw += ep_r
-
-        if i_episode % 10 == 0 and dqn.memory_counter > MEMORY_CAPACITY+220:
-            reward_list_print.append(reward_draw/10.0)
-            episode_list.append(i_episode)
-
     # with open('./cpaaa_locations_predict.pkl', 'wb') as f:
     #     pickle.dump(cpaaa_locations, f)
     
     # with open('./target_locations_predict.pkl', 'wb') as f:
     #     pickle.dump(target_locations, f)
-
-    # with open('./episode_subgoal_done_step.pkl', 'wb') as f:
-    #     pickle.dump(episode_subgoal_done_step, f)
-        
 
 if __name__ == '__main__':
     start = time.time()

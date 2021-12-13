@@ -113,7 +113,7 @@ class EmbryoBulletEnv(gym.Env):
 
         #Reward related parameters
         self.neighbor_goal_counter = 0
-        self.neighbor_goal_achieved_num = 40
+        self.neighbor_goal_achieved_num = 20
         ai2traget_dist_begin = np.linalg.norm(self.pos_interpolations_target_a[0][0,0] - \
                                                     self.pos_interpolations_target_a[0][1,0])
         ai2traget_dist_end = np.linalg.norm(self.pos_interpolations_target_a[-1][0,0] - \
@@ -443,12 +443,14 @@ class EmbryoBulletEnv(gym.Env):
                 self.neighbor_goal_counter += 1
                 if self.neighbor_goal_counter == self.neighbor_goal_achieved_num:
                     done = True
-                    if self.ticks < self.end_tick * 0.9:                
+                    if self.ticks < self.end_tick * 0.3:                
                         r = 0
                         print('Target reached too fast!')
                     else:                                               
                         r = 1000
                         print("Target successfully reached!")
+                        if self.ticks / 10 < self.end_point - self.start_point - 2:
+                            self.ticks = self.tick_num
                     neighbor_goal_counter = 0
                     return r, done
         # print("target model reward: %f" % r)
@@ -536,6 +538,8 @@ class EmbryoBulletEnv(gym.Env):
         #reset pre-define value
         self.ticks = 0
         self.neighbor_goal_counter = 0
+        self.tick_num = np.random.randint(TICK_RESOLUTION*19,TICK_RESOLUTION*21)
+
         #reset the observation
         self.ai_locations = []
         self.target_locations = []

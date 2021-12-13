@@ -464,13 +464,15 @@ class EmbryoBulletEnv(gym.Env):
                 if self.goal_counter == self.goal_achieved_num:
                     done = True
                     self.goal_counter = 0
-                    if self.ticks < self.end_tick * 0.7:
+                    if self.ticks < self.end_tick * 0.3:
                         r = 0
                         print('Target reached too fast!')
                     else:
                         r = 100
                         self.subgoal_done_step.append(self.ticks)
                         print("Target successfully reached!")
+                        if self.ticks / 10 < self.end_point - self.start_point - 2:
+                            self.ticks = self.tick_num
                     return r, sg_done, done
         #Subgoals
         if self.neighbor_goal_counter == self.neighbor_goal_achieved_num:
@@ -580,6 +582,7 @@ class EmbryoBulletEnv(gym.Env):
         p.resetBasePositionAndOrientation(self.agent[0],self.pos_interpolations_target_a[0][0][0],[0,0,0,1])
         #reset pre-define value
         self.ticks = 0
+        self.tick_num = np.random.randint(TICK_RESOLUTION*19,TICK_RESOLUTION*21)
         self.current_subgoal_index = 0
         self.subgoals = subgoals
         self.current_subgoal = self.subgoals[self.current_subgoal_index]
