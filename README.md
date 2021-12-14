@@ -58,6 +58,9 @@ A: Please try ```pip install numpy --upgrade```<br />
 Q: Unable to install pytorch 0.4.1.<br />
 A: Please try ```pip install torch==0.4.1```<br />
 
+Q: Unable to install gym with version 0.18.0.<br />
+A: Please try a newer verison: ```pip install gym==0.21.0```<br />
+
 
 
 
