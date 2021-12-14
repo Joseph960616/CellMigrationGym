@@ -9,7 +9,7 @@ pybullet                  3.0.8<br />
 pytorch                   0.4.1 <br />
 numpy                     1.19.4<br />
 matplotlib                3.3.3<br />
-sklearn                   0.22<br />
+scikit-learn              0.22<br />
 
 # File structure<br />
 ./DRL: **Folder**  for DRL related model and data<br />
@@ -47,6 +47,19 @@ Two Files are generated in the 'saved_data' folder after the evaluation:<br />
 **target_locations.pkl**: location of the target cell (ABarpaapp) at each time step.<br />
 
 Two pickle files generated for each run above can be used for data analysis and visualization for figure 7,8 and 10.
+
+# FAQ <br />
+Q: No module name 'sklearn.forest.ensemble' after installing scikit-learn.<br />
+A: sklearn.ensemble.forest was renamed to sklearn.ensemble._forest, Please install an older sklearn version: ```pip install scikit-learn==0.22```<br />
+
+Q: ImportError: numpy.core.multiarray failed to import.<br />
+A: Please try ```pip install numpy --upgrade```<br />
+
+Q: Unable to install pytorch 0.4.1.<br />
+A: Please try ```pip install torch==0.4.1```<br />
+
+
+
 
 # Citation <br />
 Will update after paper submission.

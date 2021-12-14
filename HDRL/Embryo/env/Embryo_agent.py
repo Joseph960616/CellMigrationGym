@@ -25,7 +25,7 @@ class EmbryoAgent():
         """
         action = self.action_list[action]
         ########### add noise to ai moving speed##################
-        speed = (self.speed_base + np.random.normal(0, self.speed_base  / 5, 1)[0]) * action
+        speed = (self.speed_base + np.random.normal(0, self.speed_base / 5, 1)[0]) * action
         p.resetBaseVelocity(self.agent,linearVelocity = speed, physicsClientId = self.client)
         # print(speed)
         
