@@ -43,8 +43,8 @@ Explore the successful scenarios with DRL: Command: ```python3 ./DRL/simulation.
 Explore the successful scenarios with HDRL: Command: ```python3 ./HDRL/simulation.py --em [0-2]```<br />
 
 Two Files are generated in the 'saved_data' folder after the evaluation:<br />
-**cpaaa_locations.pkl**: location of Cpaaa at each time step.<br />
-**target_locations.pkl**: location of the target cell (ABarpaapp) at each time step.<br />
+**cpaaa_locations.pkl**: Location of Cpaaa at each time step.<br />
+**target_locations.pkl**: Location of the target cell (ABarpaapp) at each time step.<br />
 
 Two pickle files generated for each run above can be used for data analysis and visualization for figure 7,8 and 10.
 
@@ -60,9 +60,6 @@ A: Please try ```pip install torch==0.4.1```<br />
 
 Q: Unable to install gym with version 0.18.0.<br />
 A: Please try a newer verison: ```pip install gym==0.21.0```<br />
-
-
-
 
 # Citation <br />
 Will update after paper submission.
